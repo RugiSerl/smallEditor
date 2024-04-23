@@ -16,14 +16,17 @@ func NewDraggable(rect utils.RelativeRect) Draggable {
 }
 
 func (d *Draggable) UpdateDrag(boundingBox math.Rect) {
+	// Has the user started dragging ?
 	if input.IsMouseClicked(input.MouseButtonLeft) && d.GetAbsoluteRect(boundingBox).PointCollision(input.GetMousePosition()) {
 		d.Dragging = true
 	}
 
+	// Is the user still dragging ?
 	if input.IsMouseDown(input.MouseButtonLeft) && d.Dragging {
 		d.Position.Vec2 = d.Position.Add(input.GetMouseDelta())
 	}
 
+	// Has the user finished dragging ?
 	if !input.IsMouseDown(input.MouseButtonLeft) && d.Dragging {
 		d.Dragging = false
 	}

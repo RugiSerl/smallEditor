@@ -81,6 +81,7 @@ func (r *Resizable) EndResizing() {
 	}
 }
 
+// Get which side of the rectangle, if not none, the mouse is hovering
 func (r *Resizable) getSide() ResizeSide {
 	mousePos := input.GetMousePosition()
 	switch {
@@ -99,6 +100,7 @@ func (r *Resizable) getSide() ResizeSide {
 }
 
 // For better visual appearence, displays a different cursor if the user can resize
+// TODO: implement the diagonal arrows
 func (r *Resizable) handleCursor() {
 	mousePos := input.GetMousePosition()
 	switch {

@@ -18,9 +18,9 @@ const (
 
 type Camera2D struct {
 	rl.Camera2D
-	targetPosition  m.Vec2
-	targetZoom      float32
-	logarithmicZoom float32
+	targetPosition        m.Vec2
+	logarithmicTargetZoom float32 // Here we take a logarithmic zoom, which is modified linearly by the user. This value will then be plugged in exp() to get the true zoom
+	logarithmicSmoothZoom float32 // logarithmicSmoothZoom "follows" logarithmicTargetZoom smoothly
 }
 
 func NewCamera() *Camera2D {
@@ -28,19 +28,19 @@ func NewCamera() *Camera2D {
 	c.Camera2D = rl.NewCamera2D(rl.NewVector2(0, 0), rl.NewVector2(0, 0), 0, 1)
 	c.targetPosition = m.NewVec2(0, 0)
 
-	c.targetZoom = INITIAL_ZOOM
-	c.logarithmicZoom = 0.5 // to create an animation at the beginning
+	c.logarithmicTargetZoom = INITIAL_ZOOM
+	c.logarithmicSmoothZoom = 0.5 // to create an animation at the beginning
 
 	return c
 }
 
 func (c *Camera2D) UpdateCamera(boundingBox m.Rect) {
-	c.updatePosition(boundingBox)
+	c.updatePosition()
 	c.updateZoom()
 
 }
 
-func (c *Camera2D) updatePosition(boundingBox m.Rect) {
+func (c *Camera2D) updatePosition() {
 
 	c.Target = m.FromRL(c.Target).Add(c.targetPosition.Substract(m.FromRL(c.Target)).Scale(float64(rl.GetFrameTime()) / CAMERA_SMOOTH)).ToRL()
 	// décalage de la caméra, pour que la cible, c'est-à-dire les coordonnées de la caméra, se trouve au milieu de l'écran
@@ -49,13 +49,13 @@ func (c *Camera2D) updatePosition(boundingBox m.Rect) {
 }
 func (c *Camera2D) updateZoom() {
 
-	c.logarithmicZoom += (c.targetZoom - c.logarithmicZoom) / ZOOM_SMOOTH * float32(GetDeltaTime())
+	c.logarithmicSmoothZoom += (c.logarithmicTargetZoom - c.logarithmicSmoothZoom) / ZOOM_SMOOTH * float32(GetDeltaTime())
 
-	c.Zoom = float32(math.Exp(float64(c.logarithmicZoom)))
+	c.Zoom = float32(math.Exp(float64(c.logarithmicSmoothZoom)))
 }
 
 func (c *Camera2D) UpdateZoomInput() {
-	c.targetZoom += rl.GetMouseWheelMove() * ZOOM_AMOUNT
+	c.logarithmicTargetZoom += rl.GetMouseWheelMove() * ZOOM_AMOUNT
 
 }
 func (c *Camera2D) UpdateMoveInput() {

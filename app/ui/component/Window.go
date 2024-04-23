@@ -11,26 +11,29 @@ import (
 	"github.com/RugiSerl/smallEditor/app/ui/utils"
 )
 
+// TODO: migrate this in settings
 const SCALE = 1.0
 
 const (
+	// Height of the bar at the top of the window
 	WINDOW_BAR_LENGTH = 35 // px
 )
 
+// Enums of the type of the window
 type windowState int
 
 const (
-	ANCHORED windowState = iota
-	FREE
+	ANCHORED windowState = iota // The window cannot move and is set to its bounding box
+	FREE                        // The window can be moved and resized
 )
 
 type Window struct {
 	Container   container.Resizable
 	State       windowState
 	closeButton *ImageButton
-	Content     *graphic.Renderer
-	Padding     float64
-	Closed      bool
+	Content     *graphic.Renderer // renderer in which all the content of the window is renderer
+	Padding     float64           // Inner padding
+	Closed      bool              // Keep track if the window has been closed, waiting to be removed
 }
 
 func NewWindow(pos utils.RelativePosition, size math.Vec2, state windowState, qualityFactor float64) *Window {
@@ -62,6 +65,7 @@ func (w *Window) Update(boundingBox math.Rect) {
 	w.renderWindow(windowAbsoluteRect, barRect)
 	w.handleWindowMovement(boundingBox, barRect)
 
+	// Set the window as closed
 	if w.closeButton.Clicked {
 		w.Closed = true
 	}
@@ -69,25 +73,30 @@ func (w *Window) Update(boundingBox math.Rect) {
 }
 
 func (w *Window) renderWindow(windowRect math.Rect, barRect math.Rect) {
+	// TODO: the 0.03 is probably the roundness of the edges of the rectangle compared to its size. -> implement as setting
+	// Draw the window background
 	graphic.DrawRectRounded(windowRect, 0.03, settings.SettingInstance.Theme.WindowTheme.BackgroundColor)
+	// Draw the content inside the window
 	w.Content.Draw(w.GetRendererPosition(windowRect))
+	// Update the button to close the window
 	w.closeButton.Update(windowRect)
-
+	// Draw the bar at the top of the window
 	graphic.DrawRect(barRect, color.RGBA{255, 255, 255, 5})
 
 }
 
 func (w *Window) handleWindowMovement(boundingBox math.Rect, barRect math.Rect) {
+	// Handle resizing/moving the window
 	if w.State == FREE {
 		w.Container.UpdateResize(boundingBox)
 		if barRect.PointCollision(input.GetMousePosition()) && !w.closeButton.Hovered && !w.Container.Resizing {
 			w.Container.UpdateDrag(boundingBox)
 		}
-
 	}
+	// Handle double click to switch state of the window
 	if barRect.PointCollision(input.GetMousePosition()) || w.Container.Hovering {
 		if w.Container.HandleDoubleClick(boundingBox) {
-			if w.State == FREE { // junky code (no real choice)
+			if w.State == FREE { // junky code (no real choice). I honestly don't see any elegant way to switch state ((+1)%n maybe..)
 				w.State = ANCHORED
 			} else {
 				w.State = FREE
@@ -97,28 +106,33 @@ func (w *Window) handleWindowMovement(boundingBox math.Rect, barRect math.Rect) 
 	}
 }
 
+// Get the size of the renderer
 func (w *Window) GetRendererSize(windowSize math.Vec2) math.Vec2 {
 	return windowSize.Substract(math.NewVec2(w.Padding*2, WINDOW_BAR_LENGTH+w.Padding*2))
 }
 
+// Get the position of the renderer
 func (w *Window) GetRendererPosition(windowAbsoluteRect math.Rect) math.Vec2 {
 	return windowAbsoluteRect.Position.Add(math.NewVec2(w.Padding, WINDOW_BAR_LENGTH+w.Padding))
 }
 
+// Get the window Rect in absolute coordinates
 func (w *Window) GetWindowRect(boundingBox math.Rect) math.Rect {
-	var windowAbsoluteRect math.Rect // rect with absolute coordinates
+	var windowAbsoluteRect math.Rect // Rect with absolute coordinates
 	if w.State == FREE {
 		windowAbsoluteRect = w.Container.GetAbsoluteRect(boundingBox)
-	} else {
+	} else { // The rect is fixed to the size of the bounding box
 		windowAbsoluteRect = boundingBox
 	}
 	return windowAbsoluteRect
 }
 
+// Resize (reload) the renderer
 func (w *Window) Resize(newSize math.Vec2) {
 	w.Content = w.Content.Resize(newSize)
 }
 
+// convert position from the position in pixel from the top left of the window (Raylib), to the position in the window
 func (w *Window) ConvertPositionToRenderer(v math.Vec2, boundingBox math.Rect) math.Vec2 {
 	return v.
 		Substract(w.GetRendererPosition(w.GetWindowRect(boundingBox))). // substract the position of the renderer

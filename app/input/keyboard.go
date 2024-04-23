@@ -129,10 +129,6 @@ const (
 	KeyVolumeDown Key = 25
 )
 
-var (
-	KeyString map[int32]int32 = make(map[int32]int32)
-)
-
 func IsKeyPressed(key Key) bool {
 	return rl.IsKeyPressed(int32(key))
 }
@@ -150,10 +146,9 @@ func GetKeysPressed() string {
 		word = append(word, key)
 		key = rl.GetCharPressed()
 	}
+	// NOTE: Enter is sadly not registered as string in GetCharPressed(), so we have to manually, which will not respect the order of the keys for a low framerate
 	if IsKeyPressed(KeyEnter) {
 		word = append(word, '\n')
-	} else if IsKeyPressed(KeyBackspace) {
-		word = append(word, 8) // backspace ascii
 	}
 	return string(word)
 }
