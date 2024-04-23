@@ -10,7 +10,11 @@ Small project to code an golang ide in golang
 For a debug build:
 
 Get into the repository folder and type:
-> go run main.go
+```bash
+go run main.go
+```
 
 For a release build:
-> go build -ldflags -H=windowsgui
+```bash
+go build -ldflags -H=windowsgui
+```
