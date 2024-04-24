@@ -11,9 +11,6 @@ import (
 	"github.com/RugiSerl/smallEditor/app/ui/utils"
 )
 
-// TODO: migrate this in settings
-const SCALE = 1.0
-
 const (
 	// Height of the bar at the top of the window
 	WINDOW_BAR_LENGTH = 35 // px
@@ -27,6 +24,7 @@ const (
 	FREE                        // The window can be moved and resized
 )
 
+// Extends from ScrollableContainer.
 type Window struct {
 	container.ScrollableContainer
 	State       windowState
@@ -37,18 +35,18 @@ type Window struct {
 
 func NewWindow(rect utils.RelativeRect, state windowState, qualityFactor float64) *Window {
 	w := new(Window)
-	w.ScrollableContainer = container.NewScrollableContainer(rect)
+	w.ScrollableContainer = container.NewScrollableContainer(rect, w.GetRendererSize(rect.Size), qualityFactor)
 	w.State = state
-	w.Padding = 5 * SCALE
+	w.Padding = 5 * settings.SettingInstance.Scale
 	w.Closed = false
-	w.Content = graphic.NewRenderTexture(w.GetRendererSize(rect.Size), qualityFactor)
+
 	w.closeButton = NewImageButton("assets/exit.png", utils.RelativeRect{
 		Position: utils.RelativePosition{
 			HorizontalAnchor: utils.ANCHOR_RIGHT,
 			VerticalAnchor:   utils.ANCHOR_TOP,
 			Vec2:             math.NewVec2(0, 0),
 		},
-		Size: math.NewVec2(SCALE*WINDOW_BAR_LENGTH, SCALE*WINDOW_BAR_LENGTH),
+		Size: math.NewVec2(WINDOW_BAR_LENGTH, WINDOW_BAR_LENGTH).Scale(settings.SettingInstance.Scale),
 	})
 	return w
 }
@@ -88,7 +86,7 @@ func (w *Window) handleWindowMovement(boundingBox math.Rect, barRect math.Rect) 
 	// Handle resizing/moving the window
 	if w.State == FREE {
 		w.UpdateResize(boundingBox)
-		if barRect.PointCollision(input.GetMousePosition()) && !w.closeButton.Hovered && !w.Resizing {
+		if !w.closeButton.Hovered && !w.Resizing {
 			w.UpdateDrag(boundingBox)
 		}
 	}

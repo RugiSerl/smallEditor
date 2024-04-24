@@ -10,15 +10,11 @@ import (
 	"github.com/RugiSerl/smallEditor/app/ui/utils"
 )
 
-const (
-	SCROLL_SPEED         = 2
-	SCROLL_SMOOTH_AMOUNT = 20 // Amount of smooth given for TextEditor.smoothScrollOffset
-)
-
+// Extends from Window.
+// Object used to edit a file of code.
 type TextEditor struct {
-	*Window                   // Window containing of the TextEditor
-	camera  *graphic.Camera2D // Camera used to zoom/de-zoom
-	textbox *TextBox
+	*Window          // Window containing of the TextEditor
+	textbox *TextBox // Object containing the text
 }
 
 func NewTextEditor(rect utils.RelativeRect, state windowState, text string) *TextEditor {
@@ -30,29 +26,24 @@ func NewTextEditor(rect utils.RelativeRect, state windowState, text string) *Tex
 	t.textbox = NewTextBox(rect, textBoxFont)
 	t.textbox.InsertText(textBoxText)
 
-	t.camera = graphic.NewCamera()
+	t.Camera = graphic.NewCamera()
 	return t
 }
 
 // Main function called each frame
 func (t *TextEditor) Update(boundingBox math.Rect) {
 	t.handleInput()
-	// Update zoom
-	t.camera.UpdateCamera(boundingBox)
 
 	// Start to draw inside the window renderer
-	t.Content.Begin()
-	// Start camera mode to allow zoom
-	t.camera.Begin()
+	t.Window.BeginRendering(boundingBox)
+
 	// Actual rendering
 	t.textbox.Update(boundingBox, settings.SettingInstance.Theme.TextEditorTheme.TextColor)
 
-	// End of camera mode
-	t.camera.End()
 	// End of renderer mode
-	t.Content.End()
+	t.Window.EndRendering()
 
-	//update the containing window, (which will also draw the renderer in which we draw)
+	// Update the containing window, (which will also draw the renderer in which we draw)
 	t.Window.Update(boundingBox)
 
 }
@@ -61,13 +52,15 @@ func (t *TextEditor) Update(boundingBox math.Rect) {
 func (t *TextEditor) handleInput() {
 	// Handling zoom
 	if input.IsKeyDown(input.KeyLeftControl) {
-		t.camera.UpdateZoomInput()
+		t.Camera.UpdateZoomInput()
 
+	} else {
+		t.UpdateScroll()
 	}
 
 }
 
 // convert position from the position in pixel from the top left of the window (Raylib), to the position in the textBox
 func (t *TextEditor) convertPosition(v math.Vec2, boundingBox math.Rect) math.Vec2 {
-	return t.camera.ConvertToWorldCoordinates(t.ConvertPositionToRenderer(v, boundingBox)) // get the conversion from the camera
+	return t.Camera.ConvertToWorldCoordinates(t.ConvertPositionToRenderer(v, boundingBox)) // get the conversion from the camera
 }

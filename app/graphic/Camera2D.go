@@ -86,3 +86,7 @@ func (c *Camera2D) Begin() {
 func (c *Camera2D) End() {
 	rl.EndMode2D()
 }
+
+func (c *Camera2D) SetTargetPosition(pos m.Vec2) {
+	c.targetPosition = pos
+}

@@ -6,4 +6,6 @@
 - Add cursor to edit text
 - Add limit to resize window
 - Add stack system to handle windows -> use abstract class
-- 
+- Fix the class members being public everywhere
+- Handle scroll
+- Display cursor
