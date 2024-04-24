@@ -28,21 +28,20 @@ const (
 )
 
 type Window struct {
-	Container   container.Resizable
+	container.ScrollableContainer
 	State       windowState
 	closeButton *ImageButton
-	Content     *graphic.Renderer // renderer in which all the content of the window is renderer
-	Padding     float64           // Inner padding
-	Closed      bool              // Keep track if the window has been closed, waiting to be removed
+	Padding     float64 // Inner padding
+	Closed      bool    // Keep track if the window has been closed, waiting to be removed
 }
 
-func NewWindow(pos utils.RelativePosition, size math.Vec2, state windowState, qualityFactor float64) *Window {
+func NewWindow(rect utils.RelativeRect, state windowState, qualityFactor float64) *Window {
 	w := new(Window)
-	w.Container = container.NewResizable(utils.RelativeRect{Position: pos, Size: size})
+	w.ScrollableContainer = container.NewScrollableContainer(rect)
 	w.State = state
 	w.Padding = 5 * SCALE
 	w.Closed = false
-	w.Content = graphic.NewRenderTexture(w.GetRendererSize(size), qualityFactor)
+	w.Content = graphic.NewRenderTexture(w.GetRendererSize(rect.Size), qualityFactor)
 	w.closeButton = NewImageButton("assets/exit.png", utils.RelativeRect{
 		Position: utils.RelativePosition{
 			HorizontalAnchor: utils.ANCHOR_RIGHT,
@@ -88,20 +87,19 @@ func (w *Window) renderWindow(windowRect math.Rect, barRect math.Rect) {
 func (w *Window) handleWindowMovement(boundingBox math.Rect, barRect math.Rect) {
 	// Handle resizing/moving the window
 	if w.State == FREE {
-		w.Container.UpdateResize(boundingBox)
-		if barRect.PointCollision(input.GetMousePosition()) && !w.closeButton.Hovered && !w.Container.Resizing {
-			w.Container.UpdateDrag(boundingBox)
+		w.UpdateResize(boundingBox)
+		if barRect.PointCollision(input.GetMousePosition()) && !w.closeButton.Hovered && !w.Resizing {
+			w.UpdateDrag(boundingBox)
 		}
 	}
 	// Handle double click to switch state of the window
-	if barRect.PointCollision(input.GetMousePosition()) || w.Container.Hovering {
-		if w.Container.HandleDoubleClick(boundingBox) {
+	if barRect.PointCollision(input.GetMousePosition()) || w.Hovering {
+		if w.HandleDoubleClick(boundingBox) {
 			if w.State == FREE { // junky code (no real choice). I honestly don't see any elegant way to switch state ((+1)%n maybe..)
 				w.State = ANCHORED
 			} else {
 				w.State = FREE
 			}
-
 		}
 	}
 }
@@ -120,7 +118,7 @@ func (w *Window) GetRendererPosition(windowAbsoluteRect math.Rect) math.Vec2 {
 func (w *Window) GetWindowRect(boundingBox math.Rect) math.Rect {
 	var windowAbsoluteRect math.Rect // Rect with absolute coordinates
 	if w.State == FREE {
-		windowAbsoluteRect = w.Container.GetAbsoluteRect(boundingBox)
+		windowAbsoluteRect = w.GetAbsoluteRect(boundingBox)
 	} else { // The rect is fixed to the size of the bounding box
 		windowAbsoluteRect = boundingBox
 	}

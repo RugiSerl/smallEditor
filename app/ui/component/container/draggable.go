@@ -6,16 +6,16 @@ import (
 	"github.com/RugiSerl/smallEditor/app/ui/utils"
 )
 
-type Draggable struct {
+type DraggableContainer struct {
 	utils.RelativeRect
 	Dragging bool
 }
 
-func NewDraggable(rect utils.RelativeRect) Draggable {
-	return Draggable{rect, false}
+func NewDraggableContainer(rect utils.RelativeRect) DraggableContainer {
+	return DraggableContainer{rect, false}
 }
 
-func (d *Draggable) UpdateDrag(boundingBox math.Rect) {
+func (d *DraggableContainer) UpdateDrag(boundingBox math.Rect) {
 	// Has the user started dragging ?
 	if input.IsMouseClicked(input.MouseButtonLeft) && d.GetAbsoluteRect(boundingBox).PointCollision(input.GetMousePosition()) {
 		d.Dragging = true

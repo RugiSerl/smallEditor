@@ -17,8 +17,7 @@ type Interface struct {
 func NewInterface() *Interface {
 	i := new(Interface)
 	f, _ := IO.ParseFile("app/app.go")
-	i.text = component.NewTextEditor(utils.RelativePosition{HorizontalAnchor: utils.ANCHOR_LEFT, VerticalAnchor: utils.ANCHOR_TOP, Vec2: math.NewVec2(0, 0)}, math.NewVec2(600, 400), component.ANCHORED)
-	i.text.AppendText(f.GetText())
+	i.text = component.NewTextEditor(utils.RelativeRect{Position: utils.RelativePosition{HorizontalAnchor: utils.ANCHOR_LEFT, VerticalAnchor: utils.ANCHOR_TOP, Vec2: math.NewVec2(0, 0)}, Size: math.NewVec2(600, 400)}, component.ANCHORED, f.GetText())
 	i.logo = component.NewImageLabel(utils.RelativeRect{Position: utils.RelativePosition{HorizontalAnchor: utils.ANCHOR_MIDDLE, VerticalAnchor: utils.ANCHOR_MIDDLE, Vec2: math.NewVec2(0, 0)}, Size: math.NewVec2(128, 128)}, "assets/logo.png")
 
 	return i

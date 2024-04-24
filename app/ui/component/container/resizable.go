@@ -23,19 +23,19 @@ const (
 	Right
 )
 
-// a resizable object extends from draggable
-type Resizable struct {
-	Draggable
+// A ResizableContainer object extends from DraggableContainer
+type ResizableContainer struct {
+	DraggableContainer
 	Hovering, Resizing bool
 	side               ResizeSide
 	lastClick          float64 // The last time the user clicked to handle double click
 }
 
-func NewResizable(rect utils.RelativeRect) Resizable {
-	return Resizable{NewDraggable(rect), false, false, None, 5}
+func NewResizableContainer(rect utils.RelativeRect) ResizableContainer {
+	return ResizableContainer{NewDraggableContainer(rect), false, false, None, 5}
 }
 
-func (r *Resizable) UpdateResize(boundingBox m.Rect) {
+func (r *ResizableContainer) UpdateResize(boundingBox m.Rect) {
 
 	r.handleCursor()
 	r.startResizing()
@@ -45,7 +45,7 @@ func (r *Resizable) UpdateResize(boundingBox m.Rect) {
 }
 
 // Check if the user has started resizing
-func (r *Resizable) startResizing() {
+func (r *ResizableContainer) startResizing() {
 	if input.IsMouseClicked(input.MouseButtonLeft) {
 		r.side = r.getSide()
 		r.Resizing = r.side != None
@@ -55,7 +55,7 @@ func (r *Resizable) startResizing() {
 }
 
 // The User is resizing the container
-func (r *Resizable) resize() {
+func (r *ResizableContainer) resize() {
 	if r.Resizing {
 
 		switch r.side {
@@ -74,7 +74,7 @@ func (r *Resizable) resize() {
 }
 
 // Check if the user has stopped resizing
-func (r *Resizable) EndResizing() {
+func (r *ResizableContainer) EndResizing() {
 	if !input.IsMouseDown(input.MouseButtonLeft) {
 		r.Resizing = false
 		r.side = None
@@ -82,7 +82,7 @@ func (r *Resizable) EndResizing() {
 }
 
 // Get which side of the rectangle, if not none, the mouse is hovering
-func (r *Resizable) getSide() ResizeSide {
+func (r *ResizableContainer) getSide() ResizeSide {
 	mousePos := input.GetMousePosition()
 	switch {
 	case math.Abs(mousePos.X-r.Position.X) < RESIZE_LENIENCY:
@@ -101,7 +101,7 @@ func (r *Resizable) getSide() ResizeSide {
 
 // For better visual appearence, displays a different cursor if the user can resize
 // TODO: implement the diagonal arrows
-func (r *Resizable) handleCursor() {
+func (r *ResizableContainer) handleCursor() {
 	mousePos := input.GetMousePosition()
 	switch {
 	case math.Abs(mousePos.X-r.Position.X) < RESIZE_LENIENCY:
@@ -118,7 +118,7 @@ func (r *Resizable) handleCursor() {
 }
 
 // Returns bool - whether the user want to change the state of the container (like ANCHORED or FREE)
-func (r *Resizable) HandleDoubleClick(boundingBox m.Rect) bool {
+func (r *ResizableContainer) HandleDoubleClick(boundingBox m.Rect) bool {
 	r.lastClick += graphic.GetDeltaTime()
 	if input.IsMouseClicked(input.MouseButtonLeft) {
 		if r.lastClick < DOUBLE_CLICK_INTERVAL {
