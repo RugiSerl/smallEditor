@@ -11,16 +11,11 @@ import (
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
-const (
-	KEY_COOLDOWN = 0.03 // Amount of time to wait when a key is down between each action it triggers
-)
-
 type TextBox struct {
-	rect        utils.RelativeRect
-	cursor      int                   // Index where the cursor is located to insert text
-	text        string                // Text displayed
-	font        *graphic.Font         // Font used to draw text
-	keyCoolDown map[input.Key]float64 // Used to regulate the amount of key per second
+	rect   utils.RelativeRect
+	cursor int           // Index where the cursor is located to insert text
+	text   string        // Text displayed
+	font   *graphic.Font // Font used to draw text
 }
 
 func NewTextBox(rect utils.RelativeRect, font *graphic.Font) *TextBox {
@@ -29,8 +24,6 @@ func NewTextBox(rect utils.RelativeRect, font *graphic.Font) *TextBox {
 	t.text = ""
 	t.font = font
 	t.cursor = 0
-	t.keyCoolDown = make(map[input.Key]float64)
-	t.keyCoolDown[input.KeyBackspace] = 0
 
 	return t
 }
@@ -50,21 +43,18 @@ func (t *TextBox) handleInput() {
 	// Get Text entered by user
 	t.InsertText(input.GetKeysPressed())
 
-	// TODO: create an object to generalize action of key down (first pontual action, then repeat it)
 	// Remove characteres from string
-	if input.IsKeyDown(input.KeyBackspace) && t.cursor > 0 && t.keyCoolDown[input.KeyBackspace] > KEY_COOLDOWN {
+	if input.IsKeyDownUsingCoolDown(input.KeyBackspace) && t.cursor > 0 {
 		t.text = t.text[:t.cursor-1] + t.text[t.cursor:]
 		t.cursor--
-		t.keyCoolDown[input.KeyBackspace] = 0
 	}
 
-	if input.IsKeyPressed(input.KeyLeft) && t.cursor > 0 {
+	if input.IsKeyDownUsingCoolDown(input.KeyLeft) && t.cursor > 0 {
 		t.cursor--
 	}
-	if input.IsKeyPressed(input.KeyRight) && t.cursor < len(t.text)-1 {
+	if input.IsKeyDownUsingCoolDown(input.KeyRight) && t.cursor < len(t.text)-1 {
 		t.cursor++
 	}
-	t.keyCoolDown[input.KeyBackspace] += graphic.GetDeltaTime()
 }
 
 // Drawing the TextBox
@@ -77,8 +67,9 @@ func (t *TextBox) Render(boundingBox math.Rect, color color.RGBA) {
 	graphic.DrawRect(math.NewRect(t.GetCursorPosition(), math.NewVec2(2, lineHeight)), rl.White)
 }
 
+// Get approximatively the dimension of a charactere, in px
 func (t *TextBox) GetCharSize() math.Vec2 {
-	return t.font.GetSize("A") // Get approximatively the dimension of a charactere, in px
+	return t.font.GetSize("A")
 }
 
 func (t *TextBox) GetCursorPosition() math.Vec2 {

@@ -3,6 +3,7 @@ package input
 import (
 	"fmt"
 
+	"github.com/RugiSerl/smallEditor/app/graphic"
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
@@ -129,12 +130,52 @@ const (
 	KeyVolumeDown Key = 25
 )
 
+const (
+	FULL_AUTO_TRIGGER     = 0.5  // Amount of time before the mode switches to "full auto"
+	KEY_COOLDOWN_DURATION = 0.03 // Amount of time to wait when a key is down between each action it triggers in full auto
+)
+
+var (
+	keyCoolDowns map[Key]float64 = make(map[Key]float64) // Used to regulate the amount of key per second
+)
+
 func IsKeyPressed(key Key) bool {
 	return rl.IsKeyPressed(int32(key))
 }
 
 func IsKeyDown(key Key) bool {
 	return rl.IsKeyDown(int32(key))
+}
+
+// Must be called ONCE every frame
+func UpdateKeyCoolDown() {
+	for key := range keyCoolDowns {
+		keyCoolDowns[key] += graphic.GetDeltaTime()
+	}
+}
+
+func IsKeyDownUsingCoolDown(key Key) bool {
+	if IsKeyDown(key) {
+		if cooldown, ok := keyCoolDowns[key]; ok {
+			if cooldown > KEY_COOLDOWN_DURATION || IsKeyPressed(key) {
+				resetCoolDown(key)
+				return true
+			}
+
+		} else { // Register the new key
+			resetCoolDown(key)
+			return true
+		}
+	}
+	return false
+}
+func resetCoolDown(key Key) {
+	if IsKeyPressed(key) { // Special case -> does not go full auto if the key was just pressed
+		keyCoolDowns[key] = -FULL_AUTO_TRIGGER
+	} else {
+		keyCoolDowns[key] = 0
+	}
+
 }
 
 // Get the key pressed in the last frame as a string

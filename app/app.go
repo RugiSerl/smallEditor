@@ -1,6 +1,7 @@
 package app
 
 import (
+	"github.com/RugiSerl/smallEditor/app/input"
 	"github.com/RugiSerl/smallEditor/app/math"
 	"github.com/RugiSerl/smallEditor/app/settings"
 	"github.com/RugiSerl/smallEditor/app/ui"
@@ -41,6 +42,7 @@ func update() {
 
 	rl.DrawFPS(0, 0)
 	rl.EndDrawing()
+	input.UpdateKeyCoolDown()
 }
 
 func quit() {

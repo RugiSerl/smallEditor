@@ -3,9 +3,11 @@
 - ~~Add scale~~
 - ~~drag~~/~~resize~~ window
 - ~~zoom~~
-- Add cursor to edit text
+- ~~Add cursor to edit text~~
+- ~~Display cursor~~
+- ~~Handle scroll~~
 - Add limit to resize window
 - Add stack system to handle windows -> use abstract class
 - Fix the class members being public everywhere
-- Handle scroll
-- Display cursor
+
+- Improve renderer resizing
