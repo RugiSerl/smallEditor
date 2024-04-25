@@ -1,6 +1,7 @@
 package component
 
 import (
+	"fmt"
 	"image/color"
 	"strings"
 
@@ -50,10 +51,21 @@ func (t *TextBox) handleInput() {
 	}
 
 	if input.IsKeyDownUsingCoolDown(input.KeyLeft) && t.cursor > 0 {
-		t.cursor--
+		if input.IsKeyDown(input.KeyLeftControl) {
+			t.cursor = strings.LastIndexAny(t.text[:t.cursor-1], " \n.,:)}+-*/\"'") + 1
+		} else {
+			t.cursor--
+		}
+
 	}
 	if input.IsKeyDownUsingCoolDown(input.KeyRight) && t.cursor < len(t.text)-1 {
-		t.cursor++
+		if input.IsKeyDown(input.KeyLeftControl) {
+			t.cursor = t.cursor + strings.IndexAny(t.text[t.cursor+1:], " \n.,:({+-*/\"'") + 1
+			fmt.Println(strings.IndexAny(t.text[t.cursor:], " \n.:({+"))
+		} else {
+			t.cursor++
+		}
+
 	}
 }
 
