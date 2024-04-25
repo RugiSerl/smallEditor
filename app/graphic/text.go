@@ -15,7 +15,7 @@ type Font struct {
 }
 
 func NewFont(path string, size int32) *Font {
-	chars := []rune("azertyuiopqsdfghjklmwxcvbnAZERTYUIOPQSDFGHJKLMWXCVBN0123456789²&é\"'(-è_çà)=~#{[|`\\^@]}^$ù*,;:!¨£%µ?./§\t")
+	chars := []rune("azertyuiopqsdfghjklmwxcvbnAZERTYUIOPQSDFGHJKLMWXCVBN0123456789²&é\"'(è_çà)=~#{[|`\\^@]}^$ù*+/-,;:!¨£%µ?.§\t<>")
 	f := rl.LoadFontEx(path, size, chars, int32(len(chars)))
 	rl.SetTextureFilter(f.Texture, rl.FilterBilinear)
 	return &Font{f, path, chars}
@@ -27,11 +27,11 @@ func (f *Font) Reload() *Font {
 	return NewFont(f.path, s)
 }
 
-func (f *Font) Draw(text string, position math.Vec2, color color.RGBA) {
+func (f *Font) Draw(text string, position math.Vec2f, color color.RGBA) {
 	rl.DrawTextEx(f.Font, text, position.ToRL(), float32(settings.SettingInstance.FontSize), 0, color)
 }
 
-func (f *Font) GetSize(text string) math.Vec2 {
+func (f *Font) GetSize(text string) math.Vec2f {
 	return math.FromRL(rl.MeasureTextEx(f.Font, text, float32(settings.SettingInstance.FontSize), 0))
 
 }

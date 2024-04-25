@@ -11,13 +11,13 @@ import (
 // Extends from ResizableContainer, since in most cases, a scrollable item is resizable
 type ScrollableContainer struct {
 	ResizableContainer                   // Contains size and relative position of the container
-	RealSize           math.Vec2         // Real size of the elements in the textBox. This value must be given by the element using the container
+	RealSize           math.Vec2f        // Real size of the elements in the textBox. This value must be given by the element using the container
 	Camera             *graphic.Camera2D // Camera used to handle the movement
 	Content            *graphic.Renderer // Renderer in which all the content is renderer
-	scrollOffset       math.Vec2
+	scrollOffset       math.Vec2f
 }
 
-func NewScrollableContainer(rect utils.RelativeRect, size math.Vec2, qualityFactor float64) ScrollableContainer {
+func NewScrollableContainer(rect utils.RelativeRect, size math.Vec2f, qualityFactor float64) ScrollableContainer {
 	return ScrollableContainer{
 		ResizableContainer: NewResizableContainer(rect),
 		RealSize:           math.NewVec2(0, 0), // default value

@@ -17,11 +17,11 @@ const (
 	MouseButtonBack
 )
 
-func GetMousePosition() math.Vec2 {
+func GetMousePosition() math.Vec2f {
 	return math.FromRL(rl.GetMousePosition())
 }
 
-func GetMouseDelta() math.Vec2 {
+func GetMouseDelta() math.Vec2f {
 	return math.FromRL(rl.GetMouseDelta())
 }
 

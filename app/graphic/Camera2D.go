@@ -18,7 +18,7 @@ const (
 
 type Camera2D struct {
 	rl.Camera2D
-	targetPosition        m.Vec2
+	targetPosition        m.Vec2f
 	logarithmicTargetZoom float32 // Here we take a logarithmic zoom, which is modified linearly by the user. This value will then be plugged in exp() to get the true zoom
 	logarithmicSmoothZoom float32 // logarithmicSmoothZoom "follows" logarithmicTargetZoom smoothly
 }
@@ -75,7 +75,7 @@ func (c *Camera2D) UpdateMoveInput() {
 	}
 }
 
-func (c *Camera2D) ConvertToWorldCoordinates(coordinates m.Vec2) m.Vec2 {
+func (c *Camera2D) ConvertToWorldCoordinates(coordinates m.Vec2f) m.Vec2f {
 	return coordinates.Substract(m.FromRL(c.Offset)).Scale(1 / float64(c.Zoom)).Add(m.FromRL(c.Target))
 }
 
@@ -87,6 +87,6 @@ func (c *Camera2D) End() {
 	rl.EndMode2D()
 }
 
-func (c *Camera2D) SetTargetPosition(pos m.Vec2) {
+func (c *Camera2D) SetTargetPosition(pos m.Vec2f) {
 	c.targetPosition = pos
 }

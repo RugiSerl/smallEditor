@@ -8,7 +8,7 @@ import (
 
 type ImageLabel struct {
 	rect        utils.RelativeRect
-	textureSize math.Vec2
+	textureSize math.Vec2f
 	texture     graphic.Texture
 }
 

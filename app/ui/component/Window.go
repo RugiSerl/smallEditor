@@ -45,7 +45,7 @@ func NewWindow(rect utils.RelativeRect, state windowState, qualityFactor float64
 		Position: utils.RelativePosition{
 			HorizontalAnchor: utils.ANCHOR_RIGHT,
 			VerticalAnchor:   utils.ANCHOR_TOP,
-			Vec2:             math.NewVec2(0, 0),
+			Vec2f:            math.NewVec2(0, 0),
 		},
 		Size: math.NewVec2(WINDOW_BAR_LENGTH, WINDOW_BAR_LENGTH).Scale(settings.SettingInstance.Scale),
 	})
@@ -74,6 +74,7 @@ func (w *Window) renderWindow(windowRect math.Rect, barRect math.Rect) {
 	// TODO: the 0.03 is probably the roundness of the edges of the rectangle compared to its size. -> implement as setting
 	// Draw the window background
 	graphic.DrawRectRounded(windowRect, 0.03, settings.SettingInstance.Theme.WindowTheme.BackgroundColor)
+
 	// Draw the content inside the window
 	w.Content.Draw(w.GetRendererPosition(windowRect))
 	// Update the button to close the window
@@ -104,12 +105,12 @@ func (w *Window) handleWindowMovement(boundingBox math.Rect, barRect math.Rect) 
 }
 
 // Get the size of the renderer
-func (w *Window) GetRendererSize(windowSize math.Vec2) math.Vec2 {
+func (w *Window) GetRendererSize(windowSize math.Vec2f) math.Vec2f {
 	return windowSize.Substract(math.NewVec2(w.Padding*2, WINDOW_BAR_LENGTH+w.Padding*2))
 }
 
 // Get the position of the renderer
-func (w *Window) GetRendererPosition(windowAbsoluteRect math.Rect) math.Vec2 {
+func (w *Window) GetRendererPosition(windowAbsoluteRect math.Rect) math.Vec2f {
 	return windowAbsoluteRect.Position.Add(math.NewVec2(w.Padding, WINDOW_BAR_LENGTH+w.Padding))
 }
 
@@ -125,12 +126,12 @@ func (w *Window) GetWindowRect(boundingBox math.Rect) math.Rect {
 }
 
 // Resize (reload) the renderer
-func (w *Window) Resize(newSize math.Vec2) {
+func (w *Window) Resize(newSize math.Vec2f) {
 	w.Content = w.Content.Resize(newSize)
 }
 
 // convert position from the position in pixel from the top left of the window (Raylib), to the position in the window
-func (w *Window) ConvertPositionToRenderer(v math.Vec2, boundingBox math.Rect) math.Vec2 {
+func (w *Window) ConvertPositionToRenderer(v math.Vec2f, boundingBox math.Rect) math.Vec2f {
 	return v.
 		Substract(w.GetRendererPosition(w.GetWindowRect(boundingBox))). // substract the position of the renderer
 		Scale(w.Content.QualityFactor)                                  // unstretch what was stretched by the QualityFactor

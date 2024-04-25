@@ -23,7 +23,7 @@ func (d *DraggableContainer) UpdateDrag(boundingBox math.Rect) {
 
 	// Is the user still dragging ?
 	if input.IsMouseDown(input.MouseButtonLeft) && d.Dragging {
-		d.Position.Vec2 = d.Position.Add(input.GetMouseDelta())
+		d.Position.Vec2f = d.Position.Add(input.GetMouseDelta())
 	}
 
 	// Has the user finished dragging ?

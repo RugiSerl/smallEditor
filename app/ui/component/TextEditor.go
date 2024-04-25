@@ -32,7 +32,7 @@ func NewTextEditor(rect utils.RelativeRect, state windowState, text string) *Tex
 
 // Main function called each frame
 func (t *TextEditor) Update(boundingBox math.Rect) {
-	t.handleInput()
+	t.handleInput(boundingBox)
 
 	// Start to draw inside the window renderer
 	t.Window.BeginRendering(boundingBox)
@@ -49,7 +49,7 @@ func (t *TextEditor) Update(boundingBox math.Rect) {
 }
 
 // Handle user input
-func (t *TextEditor) handleInput() {
+func (t *TextEditor) handleInput(boundingBox math.Rect) {
 	// Handling zoom
 	if input.IsKeyDown(input.KeyLeftControl) {
 		t.Camera.UpdateZoomInput()
@@ -58,9 +58,13 @@ func (t *TextEditor) handleInput() {
 		t.UpdateScroll()
 	}
 
+	if input.IsMouseClicked(input.MouseButtonLeft) {
+		t.textbox.SetCursorPosition(t.convertPosition(input.GetMousePosition(), boundingBox))
+	}
+
 }
 
 // convert position from the position in pixel from the top left of the window (Raylib), to the position in the textBox
-func (t *TextEditor) convertPosition(v math.Vec2, boundingBox math.Rect) math.Vec2 {
+func (t *TextEditor) convertPosition(v math.Vec2f, boundingBox math.Rect) math.Vec2f {
 	return t.Camera.ConvertToWorldCoordinates(t.ConvertPositionToRenderer(v, boundingBox)) // get the conversion from the camera
 }

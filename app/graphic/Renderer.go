@@ -8,17 +8,17 @@ import (
 // Texture used to render things on it
 type Renderer struct {
 	rl.RenderTexture2D
-	Size          math.Vec2
+	Size          math.Vec2f
 	QualityFactor float64
 }
 
 // Returns a new instance of Renderer
-func NewRenderTexture(size math.Vec2, qualityFactor float64) *Renderer {
+func NewRenderTexture(size math.Vec2f, qualityFactor float64) *Renderer {
 	return &Renderer{rl.LoadRenderTexture(int32(size.X*qualityFactor), int32(size.Y*qualityFactor)), size, qualityFactor}
 }
 
 // Resize the renderer by creating a new one and disposing of the last one to avoid memory leaks
-func (r *Renderer) Resize(newSize math.Vec2) *Renderer {
+func (r *Renderer) Resize(newSize math.Vec2f) *Renderer {
 	rl.UnloadRenderTexture(r.RenderTexture2D)
 	return NewRenderTexture(newSize, r.QualityFactor)
 }
@@ -30,7 +30,7 @@ func (r *Renderer) GetTexture() Texture {
 
 // Draw the renderer
 // NOTE: The texture has been flipped upside down because for some reason it is upside down when displaying normally
-func (r *Renderer) Draw(position math.Vec2) {
+func (r *Renderer) Draw(position math.Vec2f) {
 	DrawTextureRect(r.GetTexture(), math.NewRect(math.NewVec2(0, 0), math.NewVec2(r.Size.X, -r.Size.Y).Scale(r.QualityFactor)), math.NewRect(position, r.Size), math.NewVec2(0, 0), 0)
 }
 

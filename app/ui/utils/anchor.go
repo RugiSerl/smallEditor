@@ -14,15 +14,15 @@ const (
 
 type RelativePosition struct {
 	HorizontalAnchor, VerticalAnchor AnchorType
-	math.Vec2
+	math.Vec2f
 }
 
 type RelativeRect struct {
 	Position RelativePosition
-	Size     math.Vec2
+	Size     math.Vec2f
 }
 
-func (r RelativePosition) GetAbsolutePosition(referential math.Rect, size math.Vec2) math.Vec2 {
+func (r RelativePosition) GetAbsolutePosition(referential math.Rect, size math.Vec2f) math.Vec2f {
 	var x, y float64
 
 	switch r.HorizontalAnchor {
@@ -50,7 +50,7 @@ func (r RelativePosition) GetAbsolutePosition(referential math.Rect, size math.V
 	return math.NewVec2(x, y)
 }
 
-func (r RelativeRect) GetAbsolutePosition(referential math.Rect) math.Vec2 {
+func (r RelativeRect) GetAbsolutePosition(referential math.Rect) math.Vec2f {
 	return r.Position.GetAbsolutePosition(referential, r.Size)
 }
 
