@@ -1,8 +1,6 @@
 package graphic
 
 import (
-	"fmt"
-
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
@@ -48,7 +46,6 @@ func (s *Shader) SetValueFromUniformName(uniformName string, value any, uniformT
 
 }
 func (s *Shader) setValue(uniformLocation int32, value any, uniformType UniformDataType) {
-	fmt.Println("test")
 	switch value.(type) {
 	case float32:
 		rl.SetShaderValue(s.Shader, uniformLocation, []float32{value.(float32)}, rl.ShaderUniformDataType(uniformType))

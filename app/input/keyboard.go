@@ -1,8 +1,6 @@
 package input
 
 import (
-	"fmt"
-
 	"github.com/RugiSerl/smallEditor/app/graphic"
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
@@ -183,13 +181,9 @@ func GetKeysPressed() string {
 	key := rl.GetCharPressed()
 	var word []rune
 	for key > 0 {
-		fmt.Println(string(key))
 		word = append(word, key)
 		key = rl.GetCharPressed()
 	}
-	// NOTE: Enter is sadly not registered as string in GetCharPressed(), so we have to manually, which will not respect the order of the keys for a low framerate
-	if IsKeyPressed(KeyEnter) {
-		word = append(word, '\n')
-	}
+
 	return string(word)
 }

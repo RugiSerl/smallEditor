@@ -32,10 +32,10 @@ func NewTextEditor(rect utils.RelativeRect, state windowState, text string) *Tex
 
 // Main function called each frame
 func (t *TextEditor) Update(boundingBox math.Rect) {
-	t.handleInput(boundingBox)
 
 	// Start to draw inside the window renderer
 	t.Window.BeginRendering(boundingBox)
+	t.handleInput(boundingBox)
 
 	// Actual rendering
 	t.textbox.Update(boundingBox, settings.SettingInstance.Theme.TextEditorTheme.TextColor)
@@ -61,7 +61,6 @@ func (t *TextEditor) handleInput(boundingBox math.Rect) {
 	if input.IsMouseClicked(input.MouseButtonLeft) {
 		t.textbox.SetCursorPosition(t.convertPosition(input.GetMousePosition(), boundingBox))
 	}
-
 }
 
 // convert position from the position in pixel from the top left of the window (Raylib), to the position in the textBox
