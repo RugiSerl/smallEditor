@@ -6,6 +6,7 @@ import "github.com/RugiSerl/smallEditor/app/settings/theme"
 type Settings struct {
 	TextSettings
 	InterfaceSettings
+	GraphicSettings
 	theme.Theme
 }
 
@@ -20,6 +21,7 @@ func LoadSettings() {
 func GetDefaultSettings() Settings {
 	return Settings{
 		InterfaceSettings: GetDefaultInterfaceSettings(),
+		GraphicSettings:   GetDefaultGraphicSettings(),
 		TextSettings:      GetDefaultTextSettings(),
 		Theme:             theme.GetDefaultTheme(),
 	}

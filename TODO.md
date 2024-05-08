@@ -9,5 +9,8 @@
 - Add limit to resize window
 - Add stack system to handle windows -> use abstract class
 - Fix the class members being public everywhere
+- Add text selection
+- text coloring
+- Add language server (?)
 
 - Improve renderer resizing

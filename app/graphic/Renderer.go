@@ -14,7 +14,10 @@ type Renderer struct {
 
 // Returns a new instance of Renderer
 func NewRenderTexture(size math.Vec2f, qualityFactor float64) *Renderer {
-	return &Renderer{rl.LoadRenderTexture(int32(size.X*qualityFactor), int32(size.Y*qualityFactor)), size, qualityFactor}
+	r := &Renderer{rl.LoadRenderTexture(int32(size.X*qualityFactor), int32(size.Y*qualityFactor)), size, qualityFactor}
+	rl.SetTextureFilter(r.Texture, rl.TextureFilterLinear)
+	return r
+
 }
 
 // Resize the renderer by creating a new one and disposing of the last one to avoid memory leaks

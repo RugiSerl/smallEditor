@@ -12,8 +12,9 @@ import (
 )
 
 type Cursor struct {
-	Line, Column int
-	Index        int // Index where the cursor is located to insert text
+	Line, Column    int
+	Index           int // Index where the cursor is located to insert text
+	SelectionOrigin int // Index of the origin of the selection. -1 for no selection
 }
 
 type TextBox struct {
@@ -28,9 +29,10 @@ func NewTextBox(rect utils.RelativeRect, font *graphic.Font) *TextBox {
 	t := new(TextBox)
 	t.rect = rect
 	t.text = ""
-	t.font = font
-	t.cursor.Index = 0
 	t.lines = []string{}
+	t.font = font
+	t.cursor.Index = 0            // Beginning of the document
+	t.cursor.SelectionOrigin = -1 // -1 for no selection
 	return t
 }
 
@@ -106,10 +108,14 @@ func (t *TextBox) UpdateCursorFromIndex() {
 	t.cursor.Column = t.cursor.Index - strings.LastIndex(t.text[:t.cursor.Index], "\n") - 1
 }
 
-// Update cusor position depending on its line and column
-func (t *TextBox) UpdateCursorFromPosition(line, column int) {
-	t.cursor.Index = column
-	for i := 0; i < line; i++ {
+// Update cursor position depending on its line and column
+func (t *TextBox) UpdateCursorFromPosition() {
+	// Make sure the line and column exist
+	t.cursor.Line = math.ClampInt(0, len(t.lines), t.cursor.Line)
+	t.cursor.Column = math.ClampInt(0, len(t.lines[t.cursor.Line]), t.cursor.Column)
+
+	t.cursor.Index = t.cursor.Column
+	for i := 0; i < t.cursor.Line; i++ {
 		t.cursor.Index += len(t.lines[i]) + 1
 	}
 }
@@ -124,26 +130,44 @@ func (t *TextBox) GetCursorRealPosition() math.Vec2f {
 func (t *TextBox) SetCursorPosition(position math.Vec2f) {
 	charSize := t.GetCharSize()
 	textSize := t.GetRealSize()
-	line := int(math.Clamp(0, textSize.Y, position.Y/charSize.Y))
-	column := math.RoundWithThreshold(math.Clamp(0, float64(len(t.lines[line])), position.X/charSize.X), 0.67)
-	t.UpdateCursorFromPosition(line, column)
-
+	t.cursor.Line = int(math.Clamp(0, textSize.Y, position.Y/charSize.Y))
+	t.cursor.Column = math.RoundWithThreshold(math.Clamp(0, float64(len(t.lines[t.cursor.Line])), position.X/charSize.X), 0.67)
+	t.UpdateCursorFromPosition()
+	t.cursor.SelectionOrigin = t.cursor.Index
 }
 
 //---------------------------------------------------------------------
 // Editor functions----------------------------------------------------
 
+func (t *TextBox) handleSelection() {
+	if input.IsMouseDown(input.MouseButtonLeft) {
+
+	}
+
+}
+
 func (t *TextBox) handleSpecialKeys() {
 	// Remove characteres from string
 	if input.IsKeyDownUsingCoolDown(input.KeyBackspace) {
-		t.deleteAction(1)
+		t.ctrlAction(t.deleteAction, false) // False for left
 	}
 
+	// handle horizontal key cursor movement
 	if input.IsKeyDownUsingCoolDown(input.KeyLeft) {
 		t.ctrlAction(t.moveAction, false) // False for left
 	}
 	if input.IsKeyDownUsingCoolDown(input.KeyRight) {
 		t.ctrlAction(t.moveAction, true) // True for right
+	}
+
+	// handle vertical key cursor movement
+	if input.IsKeyDownUsingCoolDown(input.KeyUp) && t.cursor.Line > 0 {
+		t.cursor.Line--
+		t.UpdateCursorFromPosition()
+	}
+	if input.IsKeyDownUsingCoolDown(input.KeyDown) && t.cursor.Line < len(t.lines) {
+		t.cursor.Line++
+		t.UpdateCursorFromPosition()
 	}
 
 	// NOTE: Enter is sadly not registered as string in GetCharPressed(), so we have to manually, which will not respect the order of the keys for a low framerate
@@ -162,9 +186,9 @@ type action func(int)
 func (t *TextBox) ctrlAction(inputAction action, direction bool) {
 	if input.IsKeyDown(input.KeyLeftControl) { // ctrl+key action
 		if !direction { // To the left
-			inputAction(strings.LastIndexAny(t.text[:t.cursor.Index-1], " \n\t.,:)}+-*/\"'") + 1 - t.cursor.Index)
+			inputAction(strings.LastIndexAny(t.text[:t.cursor.Index-1], " \n\t.,:)}+-*\"'") + 1 - t.cursor.Index)
 		} else { // To the right
-			inputAction(strings.IndexAny(t.text[t.cursor.Index+1:], " \n\t.,:({+-*/\"'") + 1)
+			inputAction(strings.IndexAny(t.text[t.cursor.Index+1:], " \n\t.,:({+-*\"'") + 1)
 		}
 
 	} else { // Normal action
@@ -177,10 +201,10 @@ func (t *TextBox) ctrlAction(inputAction action, direction bool) {
 }
 
 // Straight forward
-func (t *TextBox) deleteAction(amount int) {
-	if amount <= t.cursor.Index {
-		t.text = t.text[:t.cursor.Index-amount] + t.text[t.cursor.Index:]
-		t.cursor.Index -= amount
+func (t *TextBox) deleteAction(offset int) {
+	if offset >= -t.cursor.Index {
+		t.text = t.text[:t.cursor.Index+offset] + t.text[t.cursor.Index:]
+		t.cursor.Index += offset
 	}
 }
 

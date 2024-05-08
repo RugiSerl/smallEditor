@@ -25,12 +25,13 @@ func Run() {
 }
 
 func start() {
+	settings.LoadSettings()
 	rl.SetConfigFlags(rl.FlagWindowResizable)
 	rl.InitWindow(800, 450, APP_NAME)
-	settings.LoadSettings()
+
 	myInterface = ui.NewInterface()
 
-	rl.SetTargetFPS(-1)
+	rl.SetTargetFPS(settings.SettingInstance.GraphicSettings.FpsCap)
 
 }
 
