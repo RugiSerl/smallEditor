@@ -13,6 +13,7 @@ import (
 
 type IWindow interface {
 	Update(boudingBox math.Rect)
+	IsClosed() bool
 }
 
 const (
@@ -138,4 +139,8 @@ func (w *Window) ConvertPositionToRenderer(v math.Vec2f, boundingBox math.Rect) 
 	return v.
 		Substract(w.GetRendererPosition(w.GetWindowRect(boundingBox))). // substract the position of the renderer
 		Scale(w.Content.QualityFactor)                                  // unstretch what was stretched by the QualityFactor
+}
+
+func (w *Window) IsClosed() bool {
+	return w.Closed
 }

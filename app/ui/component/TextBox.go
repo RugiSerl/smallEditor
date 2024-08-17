@@ -1,12 +1,12 @@
 package component
 
 import (
-	"image/color"
 	"strings"
 
 	"github.com/RugiSerl/smallEditor/app/graphic"
 	"github.com/RugiSerl/smallEditor/app/input"
 	"github.com/RugiSerl/smallEditor/app/math"
+	"github.com/RugiSerl/smallEditor/app/settings"
 	"github.com/RugiSerl/smallEditor/app/ui/utils"
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
@@ -39,10 +39,10 @@ func NewTextBox(rect utils.RelativeRect, font *graphic.Font) *TextBox {
 //---------------------------------------------------------------------
 // Update functions (Called each frame)--------------------------------
 
-func (t *TextBox) Update(boundingBox math.Rect, color color.RGBA) {
+func (t *TextBox) Update(boundingBox math.Rect) {
 	t.lines = strings.Split(t.text, "\n")
 	t.handleInput()
-	t.render(boundingBox, color)
+	t.render(boundingBox)
 	t.UpdateCursorFromIndex()
 
 }
@@ -55,11 +55,11 @@ func (t *TextBox) handleInput() {
 }
 
 // Drawing the TextBox
-func (t *TextBox) render(boundingBox math.Rect, color color.RGBA) {
+func (t *TextBox) render(boundingBox math.Rect) {
 	lines := strings.Split(t.text, "\n") // Split into line
 	lineHeight := t.GetCharSize().Y
 	for i, line := range lines { // Display line by line to get more control over text spacing
-		t.font.Draw(line, math.NewVec2(0, float64(i)*lineHeight), color)
+		t.font.Draw(line, math.NewVec2(0, float64(i)*lineHeight), settings.SettingInstance.TextColor)
 	}
 	graphic.DrawRect(math.NewRect(t.GetCursorRealPosition(), math.NewVec2(2, lineHeight)), rl.White)
 }
@@ -171,7 +171,7 @@ func (t *TextBox) handleSpecialKeys() {
 	}
 
 	// NOTE: Enter is sadly not registered as string in GetCharPressed(), so we have to manually, which will not respect the order of the keys for a low framerate
-	if input.IsKeyDownUsingCoolDown(input.KeyEnter) {
+	if input.IsKeyDownUsingCoolDown(input.KeyEnter) && !input.IsKeyDown(input.KeyLeftControl) { // TODO: ctrl+enter shortcut is reserved for terminal
 		t.InsertText("\n")
 	}
 	if input.IsKeyDownUsingCoolDown(input.KeyTab) {

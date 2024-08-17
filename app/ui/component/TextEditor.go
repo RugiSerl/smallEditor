@@ -38,7 +38,7 @@ func (t *TextEditor) Update(boundingBox math.Rect) {
 	t.handleInput(boundingBox)
 
 	// Actual rendering
-	t.textbox.Update(boundingBox, settings.SettingInstance.Theme.TextEditorTheme.TextColor)
+	t.textbox.Update(boundingBox)
 
 	// End of renderer mode
 	t.Window.EndRendering()
