@@ -165,7 +165,7 @@ func (t *TextBox) handleSpecialKeys() {
 		t.cursor.Line--
 		t.UpdateCursorFromPosition()
 	}
-	if input.IsKeyDownUsingCoolDown(input.KeyDown) && t.cursor.Line < len(t.lines) {
+	if input.IsKeyDownUsingCoolDown(input.KeyDown) && t.cursor.Line < len(t.lines)-1 {
 		t.cursor.Line++
 		t.UpdateCursorFromPosition()
 	}

@@ -1,7 +1,6 @@
 package ui
 
 import (
-	"github.com/RugiSerl/smallEditor/app/IO"
 	"github.com/RugiSerl/smallEditor/app/graphic"
 	"github.com/RugiSerl/smallEditor/app/math"
 	"github.com/RugiSerl/smallEditor/app/settings"
@@ -10,15 +9,14 @@ import (
 )
 
 type Interface struct {
-	text *component.TextEditor
-	logo *component.ImageLabel
+	windowManager *component.WindowManager
+	logo          *component.ImageLabel
 }
 
 func NewInterface() *Interface {
 	i := new(Interface)
-	f, _ := IO.ParseFile("assets/shader/blur.fs")
-	i.text = component.NewTextEditor(utils.RelativeRect{Position: utils.RelativePosition{HorizontalAnchor: utils.ANCHOR_LEFT, VerticalAnchor: utils.ANCHOR_TOP, Vec2f: math.NewVec2(0, 0)}, Size: math.NewVec2(600, 400)}, component.ANCHORED, f.GetText())
 	i.logo = component.NewImageLabel(utils.RelativeRect{Position: utils.RelativePosition{HorizontalAnchor: utils.ANCHOR_MIDDLE, VerticalAnchor: utils.ANCHOR_MIDDLE, Vec2f: math.NewVec2(0, 0)}, Size: math.NewVec2(128, 128)}, "assets/logo.png")
+	i.windowManager = component.NewWindowManager()
 
 	return i
 }
@@ -26,6 +24,6 @@ func NewInterface() *Interface {
 func (i *Interface) Update(boundingBox math.Rect) {
 	graphic.ClearBackground(settings.SettingInstance.Theme.InterfaceTheme.BackgroundColor)
 	i.logo.Update(boundingBox)
-	i.text.Update(boundingBox)
+	i.windowManager.Update(boundingBox)
 
 }

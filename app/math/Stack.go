@@ -2,20 +2,25 @@ package math
 
 import "errors"
 
-// Linked list
-type Stack[T any] struct {
-	Data     T
-	Previous *Stack[T]
+type Stack[T any] interface {
+	Append(T)
+	Pop() (T, error)
 }
 
-func (s *Stack[T]) Append(data T) {
-	s = &Stack[T]{
+// Linked list
+type LinkedList[T any] struct {
+	Data     T
+	Previous *LinkedList[T]
+}
+
+func (s *LinkedList[T]) Append(data T) {
+	s = &LinkedList[T]{
 		Data:     data,
 		Previous: s,
 	}
 }
 
-func (s *Stack[T]) Pop() (T, error) {
+func (s *LinkedList[T]) Pop() (T, error) {
 	if s == nil {
 		return *new(T), errors.New("empty stack")
 	} else {

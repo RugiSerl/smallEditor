@@ -11,6 +11,10 @@ import (
 	"github.com/RugiSerl/smallEditor/app/ui/utils"
 )
 
+type IWindow interface {
+	Update(boudingBox math.Rect)
+}
+
 const (
 	// Height of the bar at the top of the window
 	WINDOW_BAR_LENGTH = 35 // px
@@ -31,7 +35,6 @@ type Window struct {
 	closeButton *ImageButton
 	Padding     float64 // Inner padding
 	Closed      bool    // Keep track if the window has been closed, waiting to be removed
-
 }
 
 func NewWindow(rect utils.RelativeRect, state windowState, qualityFactor float64) *Window {
