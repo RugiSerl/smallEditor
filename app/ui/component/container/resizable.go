@@ -84,14 +84,18 @@ func (r *ResizableContainer) EndResizing() {
 // Get which side of the rectangle, if not none, the mouse is hovering
 func (r *ResizableContainer) getSide() ResizeSide {
 	mousePos := input.GetMousePosition()
+
+	verticallyGood := mousePos.Y > r.Position.Y && mousePos.Y < r.Position.Y+r.Size.Y
+	horizontallyGood := mousePos.X > r.Position.X && mousePos.X < r.Position.X+r.Size.X
+
 	switch {
-	case math.Abs(mousePos.X-r.Position.X) < RESIZE_LENIENCY:
+	case verticallyGood && math.Abs(mousePos.X-r.Position.X) < RESIZE_LENIENCY:
 		return Left
-	case math.Abs(mousePos.X-(r.Position.X+r.Size.X)) < RESIZE_LENIENCY:
+	case verticallyGood && math.Abs(mousePos.X-(r.Position.X+r.Size.X)) < RESIZE_LENIENCY:
 		return Right
-	case math.Abs(mousePos.Y-r.Position.Y) < RESIZE_LENIENCY:
+	case horizontallyGood && math.Abs(mousePos.Y-r.Position.Y) < RESIZE_LENIENCY:
 		return Top
-	case math.Abs(mousePos.Y-(r.Position.Y+r.Size.Y)) < RESIZE_LENIENCY:
+	case horizontallyGood && math.Abs(mousePos.Y-(r.Position.Y+r.Size.Y)) < RESIZE_LENIENCY:
 		return Bottom
 	default:
 		return None
@@ -102,15 +106,10 @@ func (r *ResizableContainer) getSide() ResizeSide {
 // For better visual appearence, displays a different cursor if the user can resize
 // TODO: implement the diagonal arrows
 func (r *ResizableContainer) handleCursor() {
-	mousePos := input.GetMousePosition()
-	switch {
-	case math.Abs(mousePos.X-r.Position.X) < RESIZE_LENIENCY:
+	switch r.getSide() {
+	case Left, Right:
 		rl.SetMouseCursor(rl.MouseCursorResizeEW)
-	case math.Abs(mousePos.X-(r.Position.X+r.Size.X)) < RESIZE_LENIENCY:
-		rl.SetMouseCursor(rl.MouseCursorResizeEW)
-	case math.Abs(mousePos.Y-r.Position.Y) < RESIZE_LENIENCY:
-		rl.SetMouseCursor(rl.MouseCursorResizeNS)
-	case math.Abs(mousePos.Y-(r.Position.Y+r.Size.Y)) < RESIZE_LENIENCY:
+	case Top, Bottom:
 		rl.SetMouseCursor(rl.MouseCursorResizeNS)
 	default:
 		rl.SetMouseCursor(rl.MouseCursorDefault)
