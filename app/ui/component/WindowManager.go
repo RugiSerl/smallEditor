@@ -15,7 +15,7 @@ func NewWindowManager() *WindowManager {
 	f, _ := IO.ParseFile("assets/shader/blur.fs")
 	return &WindowManager{
 		// By default there is only one window open
-		data: []IWindow{NewTextEditor(u.RelativeRect{Position: u.RelativePosition{HorizontalAnchor: u.ANCHOR_LEFT, VerticalAnchor: u.ANCHOR_TOP, Vec2f: math.NewVec2(0, 0)}, Size: math.NewVec2(600, 400)}, ANCHORED, f.GetText()), NewTerminal()},
+		data: []IWindow{NewTextEditor(u.RelativeRect{Position: u.RelativePosition{HorizontalAnchor: u.ANCHOR_LEFT, VerticalAnchor: u.ANCHOR_TOP, Vec2f: math.NewVec2(0, 0)}, Size: math.NewVec2(600, 400)}, ANCHORED, f.GetText())},
 	}
 
 }

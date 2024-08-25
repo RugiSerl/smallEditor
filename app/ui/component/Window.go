@@ -92,8 +92,11 @@ func (w *Window) handleWindowMovement(boundingBox math.Rect, barRect math.Rect) 
 	// Handle resizing/moving the window
 	if w.State == FREE {
 		w.UpdateResize(boundingBox)
-		if !w.closeButton.Hovered && !w.Resizing {
+		if !w.closeButton.Hovered && !w.Resizing && barRect.PointCollision(input.GetMousePosition()) {
 			w.UpdateDrag(boundingBox)
+		} else if !barRect.PointCollision(input.GetMousePosition()) {
+			w.Drag()
+			w.EndDrag()
 		}
 	}
 	// Handle double click to switch state of the window
